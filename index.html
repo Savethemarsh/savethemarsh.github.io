@@ -537,13 +537,29 @@ function generateWord(rng) {
 
 // ── INIT GAME ──
 function startGame(daily) {
+  // If starting a daily game and a valid save for today exists, just restore it
+  if (daily) {
+    try {
+      const raw = localStorage.getItem("cipherdle_state");
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved.dailyGame && saved.dailyDate === getDailySeed()) {
+          loadState();
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Otherwise start fresh, clearing any stale save
+  try { localStorage.removeItem("cipherdle_state"); } catch(e) {}
+
   dailyGame = daily;
   let rng;
   if (daily) {
     currentDate = new Date();
     rng = mulberry32(getDailySeed());
   } else {
-    // Use crypto for true randomness
     const seed = crypto.getRandomValues(new Uint32Array(1))[0];
     rng = mulberry32(seed);
   }
@@ -553,8 +569,6 @@ function startGame(daily) {
   currentGuess = "";
   gameOver = false;
   keyStates = {};
-
-  try { localStorage.removeItem("cipherdle_state"); } catch(e) {}
 
   document.getElementById("menu-screen").style.display = "none";
   document.getElementById("game-screen").style.display = "flex";
