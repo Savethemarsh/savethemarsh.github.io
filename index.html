@@ -475,7 +475,7 @@
     <div class="modal-share-status" id="modal-share-status"></div>
     <div class="modal-btns">
       <button class="btn-primary" id="btn-share" onclick="shareResult()">Share Result</button>
-      <button class="btn-secondary" onclick="playAgain()">Play Again</button>
+      <button class="btn-secondary" onclick="playAgain()">Random Game</button>
       <button class="btn-secondary" onclick="goMenu()">Main Menu</button>
     </div>
   </div>
@@ -551,8 +551,15 @@ function startGame(daily) {
     } catch(e) {}
   }
 
-  // Otherwise start fresh, clearing any stale save
-  try { localStorage.removeItem("cipherdle_state"); } catch(e) {}
+  // Clear save unless it's today's daily game (preserve it for when they return)
+  try {
+    const raw = localStorage.getItem("cipherdle_state");
+    if (raw) {
+      const saved = JSON.parse(raw);
+      const isToday = saved.dailyGame && saved.dailyDate === getDailySeed();
+      if (!isToday) localStorage.removeItem("cipherdle_state");
+    }
+  } catch(e) {}
 
   dailyGame = daily;
   let rng;
