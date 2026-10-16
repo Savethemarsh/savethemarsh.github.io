@@ -1020,12 +1020,14 @@ function saveState() {
       dailyDate: dailyGame ? getDailySeed() : null,
     };
     localStorage.setItem("cipherdle_state", JSON.stringify(state));
-  } catch(e) {}
+    console.log("[Cipherdle] State saved. Guesses:", guesses.length);
+  } catch(e) { console.warn("[Cipherdle] saveState failed:", e); }
 }
 
 function loadState() {
   try {
     const raw = localStorage.getItem("cipherdle_state");
+    console.log("[Cipherdle] loadState — raw:", raw ? "found" : "empty");
     if (!raw) return false;
     const state = JSON.parse(raw);
 
@@ -1067,7 +1069,7 @@ function loadState() {
 }
 
 // ── STARTUP ──
-loadState();
+document.addEventListener("DOMContentLoaded", () => { loadState(); });
 
 // ── KEYBOARD INPUT ──
 document.addEventListener("keydown", e => {
